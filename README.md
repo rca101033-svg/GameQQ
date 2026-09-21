@@ -53,7 +53,24 @@ git push -u origin main
 ```
 
 ### 步驟 3：開啟 GitHub Pages 網頁試玩 (免安裝)
-本專案內建 `.github/workflows/godot_ci.yml`：
+本專案已內建 GitHub Actions 工作流，會自動安裝 Godot 4.3、匯出 HTML5 頁面、並部署到 GitHub Pages。
+
 1. 進入 GitHub 儲存庫的 **Settings** -> **Pages**。
 2. 在 **Build and deployment** 下方的 **Source** 選擇 **GitHub Actions**。
-3. 每次推播至 main 分支時，GitHub Actions 會自動以 Godot 4 引擎匯出 HTML5 版本，產出線上手機瀏覽器即可直接遊玩的靜態網址！
+3. 每次推播至 main 分支時，GitHub Actions 會自動以 Godot 4 引擎匯出 HTML5 版本，產出線上手機瀏覽器即可直接遊玩的靜態網址。
+4. 若專案尚未加入 `project.godot`，工作流會先生成佔位頁面，以確保 Pages 站點可成功部署；當遊戲專案加入後，下一次推播會自動進行真正的 HTML5 匯出。
+
+### Godot 4 工作流重點
+```yaml
+- name: Setup Godot 4.3
+  uses: chickensoftgames/setup-godot@v2
+  with:
+    version: "4.3.0"
+    include_templates: true
+
+- name: Export Godot project to HTML5
+  run: |
+    godot --headless --path . --export-release "Web" build/web/index.html
+```
+
+這樣可讓 GitHub Actions 在 CI 中直接執行 Godot 匯出，並部署成 `github.io` 網頁版本。

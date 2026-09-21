@@ -1,3 +1,81 @@
-chmod +x setup_and_push.sh
-./setup_and_push.sh https://github.com/<rca101033-svg>/<Gamexd>.git
+name: Godot HTML5 Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Godot 4.3
+        uses: chickensoftgames/setup-godot@v2
+        with:
+          version: "4.3.0"
+          include_templates: true
+          use-dotnet: false
+
+      - name: Prepare build output folder
+        run: mkdir -p build/web
+
+      - name: Export Godot project to HTML5
+        shell: bash
+        run: |
+          if [ -f project.godot ]; then
+            echo "Found Godot project. Exporting HTML5 build..."
+            godot --headless --path . --export-release "Web" build/web/index.html
+          else
+            echo "No project.godot found yet. Creating a placeholder page so Pages can still deploy."
+            cat > build/web/index.html <<'EOF'
+            <!doctype html>
+            <html lang="zh-Hant">
+              <head>
+                <meta charset="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <title>Wasteland: Last Horizon</title>
+                <style>
+                  body { font-family: sans-serif; margin: 2rem; background: #111827; color: #f3f4f6; }
+                  .card { max-width: 720px; margin: auto; padding: 2rem; border-radius: 16px; background: #1f2937; }
+                  a { color: #60a5fa; }
+                </style>
+              </head>
+              <body>
+                <div class="card">
+                  <h1>Wasteland: Last Horizon</h1>
+                  <p>Godot 專案尚未加入，請在專案中新增 <code>project.godot</code> 後重新推送。</p>
+                  <p>GitHub Actions 會自動執行 Godot HTML5 匯出與 Pages 部署。</p>
+                </div>
+              </body>
+            </html>
+            EOF
+          fi
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
 
