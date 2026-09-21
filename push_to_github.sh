@@ -1,7 +1,7 @@
 #!/bin/bash
 # 一鍵推播指令碼 (Linux / macOS)
 if [ -z "$1" ]; then
-    echo "使用方式: ./push_to_github.sh <您的 GitHub 儲存庫 URL>"
+    echo "使用方式: ./push_to_github.sh <https://github.com/rca101033-svg/GameQQ>"
     echo "範例: ./push_to_github.sh https://github.com/myname/wasteland-card-game.git"
     exit 1
 fi
