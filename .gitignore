@@ -1,6 +1,7 @@
 .godot/
 .import/
-export_presets.cfg
+*.import
+.vscode/
 *.translation
 *.tmp
 build/
