@@ -1,0 +1,3 @@
+chmod +x setup_and_push.sh
+./setup_and_push.sh https://github.com/<rca101033-svg>/<Gamexd>.git
+
